@@ -1,0 +1,49 @@
+---
+title: "birth-dates"
+author: "Ryan Southward"
+date: "6/15/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(ggthemes)
+```
+
+
+```{r, raw_data}
+raw_data <- read_csv("birth-date-data.csv")
+
+clean_data <- raw_data %>%
+  mutate("date" = str_sub(value, 2, 11)) %>%
+  mutate(date = ymd(date)) %>%
+  mutate("month" = month(date)) %>%
+  mutate(month = as.factor(month))
+```
+
+
+```{r, plot}
+plot <- clean_data %>%
+  group_by(month) %>%
+  summarise("count" = n()) %>%
+  select(month, count) %>%
+  ggplot(aes(x = month, y = count)) +
+  scale_x_discrete(breaks = c(2, 4, 6, 8, 10, 12)) + 
+  geom_col() +
+  labs(title = "Distribution of Birth Months, 2021 Euro League Soccer Players",
+       subtitle = "More players are born in the earlier months, seems there is some competitive advantage.",
+       x = "Month",
+       y = "Count",
+       caption = "Source: Wikipeida") + 
+      theme_stata()
+
+plot
+
+
+```
+
